@@ -3,20 +3,22 @@ import pandas as pd
 from pandas import Series, DataFrame
 import nltk
 
-def edit_distance(x,y):
-    n = len(x)
-    m = len(y)
-    dmatrix = np.zeros((n+1,m+1))
-    for i in range(0,n+1):
-        dmatrix[i,0] = i
-    for j in range(1,m+1):
-        dmatrix[0,j] = j
-    for i in range(1,n+1):
-        for j in range(1,m+1):
-            k = 0 if x[i-1]==y[j-1] else 2
-            dmatrix[i,j] = min([dmatrix[i-1,j]+1,dmatrix[i,j-1]+1,
-                dmatrix[i-1,j-1]+ k])
-    return dmatrix[n,m]
+letters = "abcdefghijklmnopqrstuvwxyz"
+other = " -'"
+def distance_1(word):
+    total = {word}
+    for i in range(0,len(word)):
+        l = word[:i]
+        r = word[i:]
+        alphabet = letters
+        if len(word) > 1 and i > 0:
+            total.update(set([l[:i-1]+r[0]+l[i-1]+r[1:]]))
+            if i < len(word):
+                alphabet = letters+other
+        total.update(set([l+c+r for c in alphabet]))
+        total.update(set([l+r[1:]]))
+        total.update(set([l+c+r[1:] for c in alphabet]))
+    return total
 
 def correction(word):
     return word
@@ -29,7 +31,7 @@ testdata = pd.read_table('testdata.txt', header=None)
 n = testdata.shape[0]
 
 exist_real_word_errors = list()
-for i in range(0,n):
+for i in range(0,20):
     misspell_count = 0
     sentence = nltk.word_tokenize(testdata[2][i])
     for p, word in enumerate(sentence):
@@ -37,6 +39,6 @@ for i in range(0,n):
            break
         if word not in vocab:
             misspell_count += 1
+            
     if misspell_count != testdata[1][i]:
         exist_real_word_errors.append([i, testdata[1][i] - misspell_count])
-print(exist_real_word_errors)
