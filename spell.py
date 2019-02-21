@@ -18,6 +18,9 @@ def edit_distance(x,y):
                 dmatrix[i-1,j-1]+ k])
     return dmatrix[n,m]
 
+def correction(word):
+    return word
+
 with open('vocab.txt') as vocab_file:
     lines = vocab_file.readlines()
 vocab = [line.strip() for line in lines]
@@ -25,12 +28,15 @@ vocab = [line.strip() for line in lines]
 testdata = pd.read_table('testdata.txt', header=None)
 n = testdata.shape[0]
 
+exist_real_word_errors = list()
 for i in range(0,n):
     misspell_count = 0
-    for word in nltk.word_tokenize(testdata[2][i]):
+    sentence = nltk.word_tokenize(testdata[2][i])
+    for p, word in enumerate(sentence):
         if misspell_count == testdata[1][i]:
            break
         if word not in vocab:
-            print(word,end=' ')
             misspell_count += 1
-    print()
+    if misspell_count != testdata[1][i]:
+        exist_real_word_errors.append([i, testdata[1][i] - misspell_count])
+print(exist_real_word_errors)
