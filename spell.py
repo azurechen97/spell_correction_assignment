@@ -21,10 +21,17 @@ def distance_1(word):
         total.update(set([l+c+r[1:] for c in alphabet])) #Substitution
     return total
 
+def distance_2(word):
+    return set(d2 for d1 in distance_1(word) for d2 in distance_1(d1))
+
 def correction(word,vocab):
     for y in distance_1(word):
         if y in vocab:
             return y
+    for y in distance_1(word.lower()):
+        if y in vocab:
+            return y
+    return "Not Found"
 
 with open('vocab.txt') as vocab_file:
     lines = vocab_file.readlines()
@@ -34,7 +41,7 @@ testdata = pd.read_table('testdata.txt', header=None)
 n = testdata.shape[0]
 
 exist_real_word_errors = list()
-for i in range(0,1):
+for i in range(0,n):
     misspell_count = 0
     sentence = word_tokenize(testdata[2][i])
     for p, word in enumerate(sentence):
@@ -42,8 +49,6 @@ for i in range(0,1):
            break
         if word not in vocab:
             misspell_count += 1
+            print(word+" "+correction(word,vocab))
     if misspell_count != testdata[1][i]:
         exist_real_word_errors.append([i, testdata[1][i] - misspell_count])
-
-w = input("input a word")
-print(correction(w,vocab))
