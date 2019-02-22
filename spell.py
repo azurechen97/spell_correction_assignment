@@ -36,7 +36,7 @@ def distance_1(word):
     return total
 
 def distance_2(word):
-    return set(d2 for d1 in distance_1(word) for d2 in distance_1(d1))
+    return set(d2 for d1 in distance_1(word) for d2 in distance_1(d1)) - distance_1(word)
 
 def log_smoothed_prob(pre,next):
     prob = math.log10((bi_freq[(pre,next)]+1))-math.log10((un_freq[pre]+V))
