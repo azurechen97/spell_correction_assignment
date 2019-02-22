@@ -180,9 +180,9 @@ for i in range(0,n):
            break
         if word not in vocab:
             non_word_count += 1
-            #correct_word = correction(sentence[p-1],word,vocab)
-            #print(str(i+1)+" "+word+" "+correct_word)
-            #result.iat[i,1] = result.iat[i,1].replace(word,correct_word)
+            correct_word = correction(sentence[p-1],word,vocab)
+            print(str(i+1)+" "+word+" "+correct_word)
+            result.iat[i,1] = result.iat[i,1].replace(word,correct_word)
     if non_word_count != testdata[1][i]:
         exist_real_word_errors.append(i)
 
@@ -190,17 +190,15 @@ for i in range(0,n):
 #    print(i)
 
 for i in exist_real_word_errors:
-    if i<498:
-        continue
-    sentence = word_tokenize(testdata[2][i])
+    sentence = word_tokenize(result.iat[i,1])
     correct_sentence = real_word_correction(sentence)
     for j in range(0,len(sentence)):
         if sentence[j] != correct_sentence[j]:
             word = sentence[j]
             correct_word = correct_sentence[j]
-            result.iat[j,1] = result.iat[j,1].replace(word,correct_word)
+            result.iat[i,1] = result.iat[i,1].replace(word,correct_word)
             break
     print(str(i+1)+" "+word+" "+correct_word)
 
 
-#np.savetxt('result.txt',result.values,fmt='%s',delimiter='\t',)
+np.savetxt('result.txt',result.values,fmt='%s',delimiter='\t',)
