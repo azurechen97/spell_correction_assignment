@@ -9,6 +9,6 @@ V = len(un_freq)
 bigrams = nltk.bigrams(reuters.words())
 bi_freq = nltk.FreqDist(bigrams)
 
-fw = open('dataFile','wb')
-pickle.dump(un_freq,fw)
-pickle.dump(bi_freq,fw)
+with open('dataFile','wb') as fw:
+    pickle.dump(un_freq,fw)
+    pickle.dump(bi_freq,fw)

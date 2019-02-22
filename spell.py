@@ -5,6 +5,7 @@ import math
 import nltk
 from nltk import word_tokenize
 from nltk.corpus import reuters
+import pickle
 
 with open('vocab.txt') as vocab_file:
     lines = vocab_file.readlines()
@@ -13,10 +14,14 @@ vocab = [line.strip() for line in lines]
 testdata = pd.read_table('testdata.txt', header=None)
 n = testdata.shape[0]
 
-un_freq = nltk.FreqDist(reuters.words())
+with open('dataFile','rb') as fr:
+    un_freq = pickle.load(fr)
+    bi_freq = pickle.load(fr)
+
+#un_freq = nltk.FreqDist(reuters.words())
 V = len(un_freq)
-bigrams = nltk.bigrams(reuters.words())
-bi_freq = nltk.FreqDist(bigrams)
+#bigrams = nltk.bigrams(reuters.words())
+#bi_freq = nltk.FreqDist(bigrams)
 
 
 letters = "abcdefghijklmnopqrstuvwxyz"
