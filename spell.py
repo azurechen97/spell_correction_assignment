@@ -126,17 +126,17 @@ def correction(pre,word,vocab):
 exist_real_word_errors = list()
 result = testdata.drop(columns=1)
 for i in range(0,n):
-    misspell_count = 0
+    non_word_count = 0
     sentence = word_tokenize(testdata[2][i])
     for p, word in enumerate(sentence):
-        if misspell_count == testdata[1][i]:
+        if non_word_count == testdata[1][i]:
            break
         if word not in vocab:
-            misspell_count += 1
+            non_word_count += 1
             correct_word = correction(sentence[p-1],word,vocab)
             print(str(i+1)+" "+word+" "+correct_word)
             result.iat[i,1] = result.iat[i,1].replace(word,correct_word)
-    if misspell_count != testdata[1][i]:
-        exist_real_word_errors.append([i, testdata[1][i] - misspell_count])
+    if non_word_count != testdata[1][i]:
+        exist_real_word_errors.append([i, testdata[1][i] - non_word_count])
 
 np.savetxt('result.txt',result.values,fmt='%s',delimiter='\t',)
