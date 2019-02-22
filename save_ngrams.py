@@ -4,11 +4,15 @@ import nltk
 from nltk.corpus import reuters
 import pickle
 
-un_freq = nltk.FreqDist(reuters.words())
-V = len(un_freq)
-bigrams = nltk.bigrams(reuters.words())
+reuters_list = reuters.words()
+un_freq = nltk.FreqDist(reuters_list)
+bigrams = nltk.bigrams(reuters_list)
 bi_freq = nltk.FreqDist(bigrams)
+V = len(un_freq)
+N = len(reuters_list)
 
 with open('dataFile','wb') as fw:
     pickle.dump(un_freq,fw)
     pickle.dump(bi_freq,fw)
+    pickle.dump(V,fw)
+    pickle.dump(N,fw)

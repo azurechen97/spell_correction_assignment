@@ -17,12 +17,14 @@ n = testdata.shape[0]
 with open('dataFile','rb') as fr:
     un_freq = pickle.load(fr)
     bi_freq = pickle.load(fr)
+    V = pickle.load(fr)
+    N = pickle.load(fr)
 
 #un_freq = nltk.FreqDist(reuters.words())
-V = len(un_freq)
 #bigrams = nltk.bigrams(reuters.words())
 #bi_freq = nltk.FreqDist(bigrams)
-
+#V = len(un_freq)
+#N = len(reuters_list)
 
 letters = "abcdefghijklmnopqrstuvwxyz"
 letters_upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -88,6 +90,7 @@ def distance_1(word):
         total.update(set([l+c+r for c in alphabet]+[l+r+c for c in alphabet])) #Insertion
         total.update(set([l+r[1:]])) #Deletion
         total.update(set([l+c+r[1:] for c in alphabet])) #Substitution
+    total = total - {""}
     return total
 
 def non_distance_1(word):
@@ -123,9 +126,50 @@ def correction(pre,word,vocab):
     else:
         return max(prob_dict,key=prob_dict.get)
 
+def generate_candidates(sentence):
+    candidates = list([sentence])
+    for p,word in enumerate(sentence):
+        if word[0] not in letters+letters_upper:
+            continue
+        elif word[0] in letters_upper: # initial letter uppercase
+            for replace in distance_1(word.lower()):
+                if len(replace) == 1:
+                    replace = replace[0].upper()
+                else:
+                    replace = replace[0].upper()+replace[1:]
+                if replace in vocab:
+                    candidate = sentence[:p]+[replace]+sentence[p+1:]
+                    if candidate not in candidates:
+                        candidates.append(candidate)
+        else:
+            for replace in distance_1(word):
+                if replace in vocab:
+                    candidate = sentence[:p]+[replace]+sentence[p+1:]
+                    if candidate not in candidates:
+                        candidates.append(candidate)
+    return candidates
+
+def sentence_prob(sentence):
+    log_prob = 0
+    for p,word in enumerate(sentence):
+        if p == 0:
+            log_prob = math.log10(un_freq[word]+1) - math.log10(N+V)
+        else:
+            pre = sentence[p-1]
+            new_prob = log_smoothed_prob(pre,word)
+            log_prob = log_prob + new_prob
+    return log_prob
+
 def real_word_correction(sentence):
-    pass
-    
+    max_prob = -10000
+    best_candidate = sentence
+    for candidate in generate_candidates(sentence):
+        prob = sentence_prob(candidate)
+        if prob > max_prob:
+            max_prob = prob
+            best_candidate = candidate
+    return best_candidate
+
 exist_real_word_errors = list()
 result = testdata.drop(columns=1)
 for i in range(0,n):
@@ -140,8 +184,23 @@ for i in range(0,n):
             #print(str(i+1)+" "+word+" "+correct_word)
             #result.iat[i,1] = result.iat[i,1].replace(word,correct_word)
     if non_word_count != testdata[1][i]:
-        exist_real_word_errors.append([i, testdata[1][i] - non_word_count])
+        exist_real_word_errors.append(i)
+
+#for i in exist_real_word_errors:
+#    print(i)
 
 for i in exist_real_word_errors:
-    print(i)
+    if i<498:
+        continue
+    sentence = word_tokenize(testdata[2][i])
+    correct_sentence = real_word_correction(sentence)
+    for j in range(0,len(sentence)):
+        if sentence[j] != correct_sentence[j]:
+            word = sentence[j]
+            correct_word = correct_sentence[j]
+            result.iat[j,1] = result.iat[j,1].replace(word,correct_word)
+            break
+    print(str(i+1)+" "+word+" "+correct_word)
+
+
 #np.savetxt('result.txt',result.values,fmt='%s',delimiter='\t',)
