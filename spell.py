@@ -122,6 +122,9 @@ def correction(pre,word,vocab):
         return word
     else:
         return max(prob_dict,key=prob_dict.get)
+
+def real_word_correction(sentence):
+    pass
     
 exist_real_word_errors = list()
 result = testdata.drop(columns=1)
@@ -133,10 +136,12 @@ for i in range(0,n):
            break
         if word not in vocab:
             non_word_count += 1
-            correct_word = correction(sentence[p-1],word,vocab)
-            print(str(i+1)+" "+word+" "+correct_word)
-            result.iat[i,1] = result.iat[i,1].replace(word,correct_word)
+            #correct_word = correction(sentence[p-1],word,vocab)
+            #print(str(i+1)+" "+word+" "+correct_word)
+            #result.iat[i,1] = result.iat[i,1].replace(word,correct_word)
     if non_word_count != testdata[1][i]:
         exist_real_word_errors.append([i, testdata[1][i] - non_word_count])
 
-np.savetxt('result.txt',result.values,fmt='%s',delimiter='\t',)
+for i in exist_real_word_errors:
+    print(i)
+#np.savetxt('result.txt',result.values,fmt='%s',delimiter='\t',)
