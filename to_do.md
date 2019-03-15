@@ -1,5 +1,5 @@
 + UPPERCASE
 + distance 2
-- real word
++ real word
 - confusion matrix
 - interploration
