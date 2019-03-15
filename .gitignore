@@ -1,0 +1,9 @@
+*.pdf
+/program
+/report
+/.vscode
+/SRILM
+/slides
+result.txt
+*.zip
+/.ipynb*
